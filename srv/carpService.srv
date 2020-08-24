@@ -1,0 +1,4 @@
+EllipsoidArray obstacles
+geometry_msgs/Point goal
+---
+geometry_msgs/Point point
