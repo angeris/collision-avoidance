@@ -18,7 +18,7 @@ CarpPilot::CarpPilot() {
     ros::param::param<std::string>(
       "obstacleList_topic", obstacleList_topic_, "obstacleList");
     ros::param::param<std::string>(
-      "carpService_topic", carpService_topic_, "carpService");
+      "carpService_topic", carpService_topic_, "/carpService");
 
     
     // ROS subs and pub
@@ -31,16 +31,17 @@ CarpPilot::CarpPilot() {
 
 
     // services
-    carpServiceClient_ = nh_.serviceClient<carp_ros::carpService>(
+    carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
         carpService_topic_, true);
 
     // inital pose is pose after takeoff
     targetPoseSp_.pose.position.x = takeoffPose_.pose.position.x;
     targetPoseSp_.pose.position.y = takeoffPose_.pose.position.y;
     targetPoseSp_.pose.position.z = takeoffHeight_;
-
-
-}
+    // set inital goal to takeoff
+    goalPose_ = targetPoseSp_.pose;
+    carpSrv_.request.goal = goalPose_.position;
+  }
 
 
 void CarpPilot::targetPose_CB(const geometry_msgs::Pose::ConstPtr& msg) {
