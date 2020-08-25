@@ -9,10 +9,13 @@ add_compile_options(-std=c++14)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  mslquad
-  roscpp
-  rospy
-)
+    mslquad
+    roscpp
+    rospy
+    std_msgs
+    geometry_msgs
+    message_generation
+    )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -48,18 +51,17 @@ find_package(Eigen3 REQUIRED)
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  Ellipsoid.msg
+  EllipsoidArray.msg
+)
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  carpService.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -69,10 +71,11 @@ find_package(Eigen3 REQUIRED)
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+  geometry_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,6 +110,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES carp_ros
   CATKIN_DEPENDS mslquad roscpp rospy
+  CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
 )
 
@@ -136,10 +140,12 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(carp_pilot src/carp_pilot.cpp)
-target_link_libraries(carp_pilot
-  ${catkin_LIBRARIES}
-  ${${PROJECT_NAME}_EXPORTED_TARGETS}
-  )
+target_link_libraries(carp_pilot ${catkin_LIBRARIES})
+add_dependencies(carp_pilot ${PROJECT_NAME}_generate_messages_cpp)
+
+
+
+
 
 
 ## Rename C++ executable without prefix

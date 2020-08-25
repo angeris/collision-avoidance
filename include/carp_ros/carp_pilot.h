@@ -13,24 +13,42 @@
 
 #include <mslquad/px4_base_controller.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include "carp_ros/carpService.h"
 
 class CarpPilot : public PX4BaseController {
  public:
     CarpPilot();
-    // topic name for the carp planner
-    std::string obstacleList_topic;
-    // topic name for the target pose
-    std::string targetPose_topic;
+    // topic name: estimation 
+    std::string obstacleList_topic_;
+    // topic name: command pose
+    std::string targetPose_topic_;
+    // service name: main carp service
+    std::string carpService_topic_;
+
 
  protected:
-    geometry_msgs::PoseWithCovarianceStamped obstacleList;
-    geometry_msgs::PoseStamped targetPoseSp;
+    // goal pose send by the user
+    geometry_msgs::Pose goalPose_;
+    // safe pose target calculated by carpService
+    geometry_msgs::PoseStamped targetPoseSp_;
+    // list of obstacles returned by the estimator
+    carp_ros::EllipsoidArray obstacleList_;
+    // main control loop
     void controlLoop() override;
 
  private:
-    ros::Subscriber targetPose_sub;  // px4 pose subscriber
-    ros::Publisher obstacleList_pub; // ob list publisher
+    // px4 pose subscriber
+    ros::Subscriber targetPose_sub_; 
     void targetPose_CB(const geometry_msgs::Pose::ConstPtr& msg);
+
+    // ob list subscriber
+    ros::Subscriber obstacleList_sub_;
+    void obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg);
+
+    // carp service
+    carp_ros::carpService carpSrv_; //data container
+    ros::ServiceClient carpServiceClient_; //service client
+
 };
 
 #endif
