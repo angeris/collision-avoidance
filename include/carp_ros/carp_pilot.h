@@ -13,7 +13,7 @@
 
 #include <mslquad/px4_base_controller.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
-#include "carp_ros/carpService.h"
+#include "carp_ros/CarpService.h"
 
 class CarpPilot : public PX4BaseController {
  public:
@@ -46,7 +46,7 @@ class CarpPilot : public PX4BaseController {
     void obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg);
 
     // carp service
-    carp_ros::carpService carpSrv_; //data container
+    carp_ros::CarpService carpSrv_; //data container
     ros::ServiceClient carpServiceClient_; //service client
 
 };
