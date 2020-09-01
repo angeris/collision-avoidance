@@ -61,6 +61,7 @@ void CarpPilot::obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg){
 
 void CarpPilot::controlLoop() {
     // call the CARP service
+    carpSrv_.request.position = curPose_.pose.position;
     if (carpServiceClient_.call(carpSrv_)){
         ROS_INFO("goal projected");
         targetPoseSp_.pose.position = carpSrv_.response.point;

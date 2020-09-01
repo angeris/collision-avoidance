@@ -13,6 +13,7 @@
 
 #include <mslquad/px4_base_controller.h>
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
+#include "carp_ros/EllipsoidArray.h"
 #include "carp_ros/CarpService.h"
 
 class CarpPilot : public PX4BaseController {
