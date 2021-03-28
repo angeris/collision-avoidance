@@ -7,7 +7,7 @@
     <arg name="quad_ns"  default="$(arg mav_name)$(arg id)"/>
     <arg name="max_vel" default="2"/>
     <arg name="takeoff_height" default="1"/>
-    <arg name="auto_takeoff" default="true"/>
+    <arg name="auto_takeoff" default="false"/>
     <arg name="targetPose_topic" default="command/pose"/>
     
     <group ns="$(arg mav_name)$(arg id)">

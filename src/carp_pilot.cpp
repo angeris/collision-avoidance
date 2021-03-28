@@ -29,11 +29,6 @@ CarpPilot::CarpPilot() {
     obstacleList_sub_ = nh_.subscribe<carp_ros::EllipsoidArray>(
       obstacleList_topic_, 1, &CarpPilot::obstacle_CB, this);
 
-
-    // services
-    carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
-        carpService_topic_, true);
-
     // inital pose is pose after takeoff
     targetPoseSp_.pose.position.x = takeoffPose_.pose.position.x;
     targetPoseSp_.pose.position.y = takeoffPose_.pose.position.y;
@@ -41,11 +36,17 @@ CarpPilot::CarpPilot() {
     // set inital goal to takeoff
     goalPose_ = targetPoseSp_.pose;
     carpSrv_.request.goal = goalPose_.position;
+
+    // start 
+    // services
+    carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
+        carpService_topic_, true);
   }
 
 
 void CarpPilot::targetPose_CB(const geometry_msgs::Pose::ConstPtr& msg) {
   // unpack the pose
+  ROS_INFO("goal");
   goalPose_ = *msg;
   carpSrv_.request.goal = goalPose_.position;
 
@@ -53,14 +54,15 @@ void CarpPilot::targetPose_CB(const geometry_msgs::Pose::ConstPtr& msg) {
 
 void CarpPilot::obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg){
   // save the list of obstacles
+  ROS_INFO("obs");
   obstacleList_ = *msg;
   carpSrv_.request.obstacles = obstacleList_;
-
 }
 
 
 void CarpPilot::controlLoop() {
     // call the CARP service
+    ROS_INFO("loop");
     carpSrv_.request.position = curPose_.pose.position;
     if (carpServiceClient_.call(carpSrv_)){
         ROS_INFO("goal projected");

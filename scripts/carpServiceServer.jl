@@ -21,25 +21,30 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.point = req.goal
     else
         # build model
+        println("building problem")
         agent = AgentModel()
         # set position
+        println("position")
         position  = [req.position.x, req.position.y, req.position.z]
         set_current_point!(agent, position)
         # set goal
-        goalPt = [goal.x, goal.y, goal.z]
-        set_goal_point!(a, goal)
-
-    
-
-
-
-
-        # real code goes here
+        println("goal")
+        goalPt = [req.goal.x, req.goal.y, req.goal.z]
+        println(req.goal)
+        println(goalPt)
+        set_goal_point!(agent, goalPt)
+        println("obs in")
         for (i, ob) in enumerate(req.obstacles.ellipsoids)
             ob_center = [ob.center.x, ob.center.y, ob.center.z] 
             ob_shape = reshape(ob.shape, (3, 3))
-            set_ellipsoid!(a, "test", ob_center, ob_shape
+            set_ellipsoid!(agent, "test", ob_center, ob_shape)
         end
+        println("proj")
+        find_projection!(agent)
+        proj = agent.projected_point
+        rsp.point.x = proj[1]
+        rsp.point.y = proj[2]
+        rsp.point.z = proj[3]
     end
     println(rsp.point)
     return rsp
