@@ -54,7 +54,7 @@ find_package(Eigen3 REQUIRED)
 add_message_files(
   FILES
   Ellipsoid.msg
-  EllipsoidArray.msg
+  obstacleArray.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -109,7 +109,7 @@ generate_messages(
 catkin_package(
   INCLUDE_DIRS include
   LIBRARIES carp_ros
-  CATKIN_DEPENDS mslquad roscpp rospy
+  CATKIN_DEPENDS roscpp rospy
   CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
 )

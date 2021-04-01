@@ -12,46 +12,83 @@
 #include<iostream>
 
 CarpPilot::CarpPilot() {
-    // retrieve ROS parameter
-    ros::param::param<std::string>(
-      "targetPose_topic", targetPose_topic_, "command/pose"); 
-    ros::param::param<std::string>(
-      "obstacleList_topic", obstacleList_topic_, "obstacleList");
-    ros::param::param<std::string>(
-      "carpService_topic", carpService_topic_, "/carpService");
+  // retrieve ROS parameter
+  ros::param::param<std::string>(
+    "quad_ns", quadID, "quad0"); 
+  ros::param::param<std::string>(
+    "targetGoal", targetGoal_topic_, "command/goal"); 
+  ros::param::param<std::string>(
+    "targetPose", targetPose_topic_, "command/pose"); 
+  ros::param::param<std::string>(
+    "targetTwist", targetGoal_topic_, "command/twist"); 
+  ros::param::param<std::string>(
+    "obstacleList", obstacleList_topic_, "obstacleList");
+  ros::param::param<std::string>(
+    "carpService", carpService_topic_, "carpService");
 
+  
+  // ROS subs
+  targetGoal_sub_ = nh_.subscribe<geometry_msgs::Pose>(
+    targetGoal_topic_, 1, &CarpPilot::targetGoal_CB, this);
+
+
+
+  obstacleList_sub_ = nh_.subscribe<carp_ros::EllipsoidArray>(
+    obstacleList_topic_, 1, &CarpPilot::obstacle_CB, this);
+
+  //ROS pubs
+  targetPose_pub = nh_.advertise<geometry_msgs::PoseStamped>(
+      targetPose_topic_, 1);
+  targetTwist_pub = nh_.advertise<geometry_msgs::TwistStamped>(
+      targetTwist_topic_, 1);
+
+
+
+  // services
+  carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
+      carpService_topic_, true);
+
+  // initial pose is pose after takeoff
+  // while (ros::ok() && currentPose_.header.seq < 100) {
+  //     std::cout << quadNS_ << ": Waiting for initial pose." << std::endl;
+  //     ros::spinOnce();
+  //     ros::Duration(1.0).sleep();
+  //   }
     
-    // ROS subs and pub
-    targetPose_sub_ = nh_.subscribe<geometry_msgs::Pose>(
-      targetPose_topic_, 1, &CarpPilot::targetPose_CB, this);
-    ROS_INFO_STREAM("Subscribed: "<< targetPose_topic_);
+  goalPose_ = currentPose_;
+  carpSrv_.request.goal = goalPose_.position;
 
-    obstacleList_sub_ = nh_.subscribe<carp_ros::EllipsoidArray>(
-      obstacleList_topic_, 1, &CarpPilot::obstacle_CB, this);
+  // start timers
+
+  setpointTimer_ = nh_.createTimer(
+    ros::Duration(1.0/setpointFreq_),
+    &CarpPilot::setpointLoopCB, this);
+
+  plannerTimer_ = nh_.createTimer(
+    ros::Duration(1.0/plannerFreq_),
+    &CarpPilot::plannerLoopCB, this);
+
+  estimationTimer_ = nh_.createTimer(
+    ros::Duration(1.0/estimationFreq_),
+    &CarpPilot::estimationLoopCB, this);
 
 
-    // services
-    carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
-        carpService_topic_, true);
 
-    // inital pose is pose after takeoff
-    targetPoseSp_.pose.position.x = takeoffPose_.pose.position.x;
-    targetPoseSp_.pose.position.y = takeoffPose_.pose.position.y;
-    targetPoseSp_.pose.position.z = takeoffHeight_;
-    // set inital goal to takeoff
-    goalPose_ = targetPoseSp_.pose;
-    carpSrv_.request.goal = goalPose_.position;
   }
 
 
-void CarpPilot::targetPose_CB(const geometry_msgs::Pose::ConstPtr& msg) {
+void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
   // unpack the pose
   goalPose_ = *msg;
   carpSrv_.request.goal = goalPose_.position;
 
 }
 
-void CarpPilot::obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg){
+void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
+  currentPose_ = *msg;
+}
+
+void CarpPilot::obstacle_CB(const carp_ros::obstacleArray& msg){
   // save the list of obstacles
   obstacleList_ = *msg;
   carpSrv_.request.obstacles = obstacleList_;
@@ -59,7 +96,7 @@ void CarpPilot::obstacle_CB(const carp_ros::EllipsoidArray::ConstPtr& msg){
 }
 
 
-void CarpPilot::controlLoop() {
+void CarpPilot::setpointLoopCB() {
     // call the CARP service
     if (carpServiceClient_.call(carpSrv_)){
         ROS_INFO("goal projected");
@@ -68,12 +105,17 @@ void CarpPilot::controlLoop() {
     else{
       ROS_ERROR("Failed to call carp service");
       }
-    // update target pose to latest 
+  // step along trajetory
+      
+  // publish the target pose
+  targetPoseSp_.header.stamp = ros::Time::now();
+  targetTwistSp_.header.stamp = ros::Time::now();
+  targetPose_pub.publish(targetPoseSp_);
+  targetTwist_pub.publish(targetTwistSp_)
+}
 
-
-    // publish the target pose
-    targetPoseSp_.header.stamp = ros::Time::now();
-    px4SetPosPub_.publish(targetPoseSp_);
+void CarpPilot::estimationLoopCB() {
+  continue;
 }
 
 

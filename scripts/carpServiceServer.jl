@@ -4,15 +4,16 @@
 using RobotOS
 
 @rosimport geometry_msgs.msg: Pose, PoseStamped
-@rosimport carp_ros.msg: Ellipsoid, EllipsoidArray
+@rosimport carp_ros.msg: Ellipsoid, obstacleArray
 @rosimport carp_ros.srv: CarpService
 rostypegen()
 import .geometry_msgs.msg: Pose, PoseStamped
-import .carp_ros.msg: Ellipsoid, EllipsoidArray
+import .carp_ros.msg: Ellipsoid, obstacleArray
 import .carp_ros.srv: CarpService, CarpServiceRequest, CarpServiceResponse
 
 function carpServiceCB(req::CarpServiceRequest)
     println("running CARP service")
+    println(req.position)
     println(req.goal)
     rsp = CarpServiceResponse()
     if length(req.obstacles.ellipsoids) == 0
@@ -20,12 +21,13 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.point = req.goal
     else
         # real code goes here
-        for ob in req.obstacles.ellipsoids
+        for name, ob in zip(req.obstacles.names, req.obstacles.ellipsoids)
+            println(name)
             println(ob.center)
             println(ob.shape)
         end
     end
-    println(rsp.point)
+    println(rsp.projection)
     return rsp
 end
 
