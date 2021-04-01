@@ -24,7 +24,7 @@ class CarpPilot {
  public:
     CarpPilot();
     ~CarpPilot();
-    // quad ame
+    // quad name
     std::string quadID_;
     // topic name: estimation 
     std::string obstacleList_topic_;
@@ -32,54 +32,51 @@ class CarpPilot {
     std::string targetGoal_topic_;
     // topic names: setpoint pose and twist
     std::string targetPose_topic_;
-    std::string targetTwist_topic_:
+    std::string targetTwist_topic_;
     // service name: main carp service
     std::string carpService_topic_;
 
 
- protected:
+ private:
     // ros node handle 
     ros::NodeHandle nh_;
-    // goal pose send by the user
-    geometry_msgs::Pose goalPose_;
     // safe pose and twist target calculated by carpService
     geometry_msgs::PoseStamped targetPoseSp_;
     geometry_msgs::TwistStamped targetTwistSp_;
     // list of obstacles returned by the estimator
-    carp_ros::EllipsoidArray obstacleList_;
+    carp_ros::obstacleArray obstacleList_;
 
     // timer loops
     // setpoint loop
     double setpointFreq_;
     ros::Timer setpointTimer_; 
-    void setpointLoopCB();
+    void setpointLoopCB(const ros::TimerEvent& event);
     // planner loop
     double plannerFreq_;
     ros::Timer plannerTimer_; 
-    void plannerLoopCB();
+    void plannerLoopCB(const ros::TimerEvent& event);
     // estimation loop
     double estimationFreq_;
     ros::Timer estimationTimer_; 
-    void estimationLoopCB();
-
- private:
-
+    void estimationLoopCB(const ros::TimerEvent& event);
 
     // px4 pose subscriber
     // current pose
     geometry_msgs::PoseStamped currentPose_;
-    void currentPose_CB(const geometry_msgs::PoseStamped& msg)
+    ros::Subscriber currentPose_sub;
+    void currentPose_CB(const geometry_msgs::PoseStamped& msg);
     // target pose
+    geometry_msgs::Pose goalPose_;
     ros::Subscriber targetGoal_sub_; 
     void targetGoal_CB(const geometry_msgs::Pose& msg);
 
     // ob list subscriber
     ros::Subscriber obstacleList_sub_;
-    void obstacle_CB(const carp_ros::EllipsoidArray& msg);
+    void obstacle_CB(const carp_ros::obstacleArray& msg);
 
     // out going pubs
     ros::Publisher targetPose_pub;
-    ros::Publisher targetTWist_pub;
+    ros::Publisher targetTwist_pub;
     // current trajectory time
     // ros::Time trajectoryTime_=0.0f;
 

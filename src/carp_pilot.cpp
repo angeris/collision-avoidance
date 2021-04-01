@@ -14,13 +14,13 @@
 CarpPilot::CarpPilot() {
   // retrieve ROS parameter
   ros::param::param<std::string>(
-    "quad_ns", quadID, "quad0"); 
+    "quad_ns", quadID_, "quad0"); 
   ros::param::param<std::string>(
     "targetGoal", targetGoal_topic_, "command/goal"); 
   ros::param::param<std::string>(
     "targetPose", targetPose_topic_, "command/pose"); 
   ros::param::param<std::string>(
-    "targetTwist", targetGoal_topic_, "command/twist"); 
+    "targetTwist", targetTwist_topic_, "command/twist"); 
   ros::param::param<std::string>(
     "obstacleList", obstacleList_topic_, "obstacleList");
   ros::param::param<std::string>(
@@ -28,13 +28,17 @@ CarpPilot::CarpPilot() {
 
   
   // ROS subs
-  targetGoal_sub_ = nh_.subscribe<geometry_msgs::Pose>(
-    targetGoal_topic_, 1, &CarpPilot::targetGoal_CB, this);
+  currentPose_sub = nh_.subscribe(
+    quadID_+"/mavros/local_position_pose", 1,
+    &CarpPilot::currentPose_CB, this);
 
+  targetGoal_sub_ = nh_.subscribe(
+    targetGoal_topic_,1,
+    &CarpPilot::targetGoal_CB, this);
 
-
-  obstacleList_sub_ = nh_.subscribe<carp_ros::EllipsoidArray>(
-    obstacleList_topic_, 1, &CarpPilot::obstacle_CB, this);
+  obstacleList_sub_ = nh_.subscribe(
+    obstacleList_topic_, 1,
+    &CarpPilot::obstacle_CB, this);
 
   //ROS pubs
   targetPose_pub = nh_.advertise<geometry_msgs::PoseStamped>(
@@ -55,7 +59,7 @@ CarpPilot::CarpPilot() {
   //     ros::Duration(1.0).sleep();
   //   }
     
-  goalPose_ = currentPose_;
+  goalPose_ = currentPose_.pose;
   carpSrv_.request.goal = goalPose_.position;
 
   // start timers
@@ -64,58 +68,61 @@ CarpPilot::CarpPilot() {
     ros::Duration(1.0/setpointFreq_),
     &CarpPilot::setpointLoopCB, this);
 
-  plannerTimer_ = nh_.createTimer(
-    ros::Duration(1.0/plannerFreq_),
-    &CarpPilot::plannerLoopCB, this);
+  // plannerTimer_ = nh_.createTimer(
+  //   ros::Duration(1.0/plannerFreq_),
+  //   &CarpPilot::plannerLoopCB, this);
 
-  estimationTimer_ = nh_.createTimer(
-    ros::Duration(1.0/estimationFreq_),
-    &CarpPilot::estimationLoopCB, this);
-
-
-
-  }
+  // estimationTimer_ = nh_.createTimer(
+  //   ros::Duration(1.0/estimationFreq_),
+  //   &CarpPilot::estimationLoopCB, this);
 
 
-void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
-  // unpack the pose
-  goalPose_ = *msg;
-  carpSrv_.request.goal = goalPose_.position;
+
+}
+CarpPilot::~CarpPilot(){
 
 }
 
 void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
-  currentPose_ = *msg;
+  currentPose_ = msg;
+}
+
+void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
+  // unpack the pose
+  goalPose_ = msg;
+  carpSrv_.request.goal = goalPose_.position;
+
 }
 
 void CarpPilot::obstacle_CB(const carp_ros::obstacleArray& msg){
   // save the list of obstacles
-  obstacleList_ = *msg;
+  obstacleList_ = msg;
   carpSrv_.request.obstacles = obstacleList_;
 
 }
 
 
-void CarpPilot::setpointLoopCB() {
-    // call the CARP service
-    if (carpServiceClient_.call(carpSrv_)){
-        ROS_INFO("goal projected");
-        targetPoseSp_.pose.position = carpSrv_.response.point;
-      }
-    else{
-      ROS_ERROR("Failed to call carp service");
-      }
-  // step along trajetory
-      
+void CarpPilot::setpointLoopCB(const ros::TimerEvent& event) {
+  // step along trajectory  
   // publish the target pose
   targetPoseSp_.header.stamp = ros::Time::now();
-  targetTwistSp_.header.stamp = ros::Time::now();
+  // targetTwistSp_.header.stamp = ros::Time::now();
   targetPose_pub.publish(targetPoseSp_);
-  targetTwist_pub.publish(targetTwistSp_)
+  // targetTwist_pub.publish(targetTwistSp_)
 }
 
-void CarpPilot::estimationLoopCB() {
-  continue;
+void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
+  // call the CARP service
+  if (carpServiceClient_.call(carpSrv_)){
+      ROS_INFO("goal projected");
+      targetPoseSp_.pose.position = carpSrv_.response.projection;
+  } else{
+    ROS_ERROR("Failed to call carp service");
+  }
+}
+
+void CarpPilot::estimationLoopCB(const ros::TimerEvent& event) {
+
 }
 
 
