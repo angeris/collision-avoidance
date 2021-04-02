@@ -58,7 +58,6 @@ CarpPilot::CarpPilot() {
   //     ros::spinOnce();
   //     ros::Duration(1.0).sleep();
   //   }
-    
   goalPose_ = currentPose_.pose;
   carpSrv_.request.goal = goalPose_.position;
 
@@ -78,6 +77,7 @@ CarpPilot::CarpPilot() {
 
 
 
+
 }
 CarpPilot::~CarpPilot(){
 
@@ -89,16 +89,20 @@ void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
 
 void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
   // unpack the pose
+<<<<<<< HEAD
   goalPose_ = msg;
+  ROS_INFO("goal");
+
   carpSrv_.request.goal = goalPose_.position;
 
 }
 
 void CarpPilot::obstacle_CB(const carp_ros::obstacleArray& msg){
   // save the list of obstacles
+<<<<<<< HEAD
   obstacleList_ = msg;
+  ROS_INFO("obs");
   carpSrv_.request.obstacles = obstacleList_;
-
 }
 
 

@@ -11,13 +11,13 @@
 #ifndef __CARP_PILOT_H__
 #define __CARP_PILOT_H__
 
+<<<<<<< HEAD
 #include <string>
 
 #include "ros/ros.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "geometry_msgs/TwistStamped.h"
 // #include <geometry_msgs/PoseWithCovarianceStamped.h>
-
 #include "carp_ros/CarpService.h"
 
 class CarpPilot {
