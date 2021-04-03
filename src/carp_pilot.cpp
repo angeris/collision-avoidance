@@ -85,7 +85,7 @@ CarpPilot::CarpPilot() {
   carpSrv_.request.obstacles = obstacleList_;
 
    // initial service call
-  ROS_INFO("calling service")
+  ROS_INFO("calling service");
   if (carpServiceClient_.call(carpSrv_)) {
     targetPoseSp_.pose.position = carpSrv_.response.projection;
     ROS_INFO("inital planner success");
