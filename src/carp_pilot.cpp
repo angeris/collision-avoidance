@@ -15,21 +15,29 @@ CarpPilot::CarpPilot() {
   // retrieve ROS parameter
   ros::param::param<std::string>(
     "quad_ns", quadID_, "quad0"); 
+  // topic names
   ros::param::param<std::string>(
-    "targetGoal", targetGoal_topic_, "command/goal"); 
+    "targetGoal_topic", targetGoal_topic_, "command/goal"); 
   ros::param::param<std::string>(
-    "targetPose", targetPose_topic_, "command/pose"); 
+    "targetPose_topic", targetPose_topic_, "command/pose"); 
   ros::param::param<std::string>(
-    "targetTwist", targetTwist_topic_, "command/twist"); 
+    "targetTwist_topic", targetTwist_topic_, "command/twist"); 
   ros::param::param<std::string>(
-    "obstacleList", obstacleList_topic_, "obstacleList");
+    "obstacleList_topic", obstacleList_topic_, "obstacleList");
   ros::param::param<std::string>(
-    "carpService", carpService_topic_, "carpService");
+    "carpService_service", carpService_topic_, "carpService");
+
+  // loop frequncies
+  ros::param::param<double>(
+    "setpointFreq", setpointFreq_, 60.0);  
+  ros::param::param<double>(
+    "plannerFreq", plannerFreq_, 1.0); 
+
 
   
   // ROS subs
   currentPose_sub = nh_.subscribe(
-    quadID_+"/mavros/local_position_pose", 1,
+    "mavros/local_position/pose", 1,
     &CarpPilot::currentPose_CB, this);
 
   targetGoal_sub_ = nh_.subscribe(
@@ -51,35 +59,57 @@ CarpPilot::CarpPilot() {
   // services
   carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
       carpService_topic_, true);
+  // carpServiceClient_.waitForExistence();
+  ROS_INFO("connected to planner service");
 
   // initial pose is pose after takeoff
-  // while (ros::ok() && currentPose_.header.seq < 100) {
-  //     std::cout << quadNS_ << ": Waiting for initial pose." << std::endl;
-  //     ros::spinOnce();
-  //     ros::Duration(1.0).sleep();
-  //   }
-  goalPose_ = currentPose_.pose;
+  while (ros::ok() && currentPose_.header.seq < 10) {
+      std::cout << quadID_ << ": waiting for initial pose." << std::endl;
+      ros::spinOnce();
+      ros::Duration(1.0).sleep();
+  }
+
+
+  while (ros::ok() && obstacleList_.ellipsoids.size() < 0) {
+      std::cout << quadID_ << ": waiting for obs " << std::endl;
+      ros::spinOnce();
+      ros::Duration(1.0).sleep();
+  }
+
+
+  carpSrv_.request.position = currentPose_.pose.position;
+  goalPose_.position.x = 0.0f;
+  goalPose_.position.y = 0.0f;
+  goalPose_.position.z = 0.0f;
   carpSrv_.request.goal = goalPose_.position;
+  carpSrv_.request.obstacles = obstacleList_;
+
+   // initial service call
+  ROS_INFO("calling service")
+  if (carpServiceClient_.call(carpSrv_)) {
+    targetPoseSp_.pose.position = carpSrv_.response.projection;
+    ROS_INFO("inital planner success");
+  } else{
+    ROS_WARN("IDK MAN");
+  }
 
   // start timers
-
   setpointTimer_ = nh_.createTimer(
     ros::Duration(1.0/setpointFreq_),
     &CarpPilot::setpointLoopCB, this);
 
-  // plannerTimer_ = nh_.createTimer(
-  //   ros::Duration(1.0/plannerFreq_),
-  //   &CarpPilot::plannerLoopCB, this);
-
+  plannerTimer_ = nh_.createTimer(
+    ros::Duration(1.0/plannerFreq_),
+    &CarpPilot::plannerLoopCB, this);
+ 
   // estimationTimer_ = nh_.createTimer(
   //   ros::Duration(1.0/estimationFreq_),
   //   &CarpPilot::estimationLoopCB, this);
-
-
-
-
+  ROS_INFO("pilot: initialzation complete");
 }
+
 CarpPilot::~CarpPilot(){
+  ROS_INFO("pilot: destroyed");
 
 }
 
@@ -89,20 +119,12 @@ void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
 
 void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
   // unpack the pose
-<<<<<<< HEAD
   goalPose_ = msg;
-  ROS_INFO("goal");
-
-  carpSrv_.request.goal = goalPose_.position;
-
 }
 
 void CarpPilot::obstacle_CB(const carp_ros::obstacleArray& msg){
   // save the list of obstacles
-<<<<<<< HEAD
   obstacleList_ = msg;
-  ROS_INFO("obs");
-  carpSrv_.request.obstacles = obstacleList_;
 }
 
 
@@ -117,11 +139,15 @@ void CarpPilot::setpointLoopCB(const ros::TimerEvent& event) {
 
 void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
   // call the CARP service
+  carpSrv_.request.position = currentPose_.pose.position;
+  carpSrv_.request.goal = goalPose_.position;
+  carpSrv_.request.obstacles = obstacleList_;
+
   if (carpServiceClient_.call(carpSrv_)){
-      ROS_INFO("goal projected");
       targetPoseSp_.pose.position = carpSrv_.response.projection;
   } else{
     ROS_ERROR("Failed to call carp service");
+    std::cout << carpSrv_.response.projection.x << std::endl;
   }
 }
 

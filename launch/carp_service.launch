@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen">
-    </node>
+    <group ns="quad0">
+        <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen"/>
+    </group>
 </launch>

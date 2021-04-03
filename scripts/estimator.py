@@ -1,23 +1,21 @@
 #!/usr/bin/env python
 # math
 import numpy as np
+import numpy.random as rand
 # ros
 import rospy
 import std_msgs.msg
 from geometry_msgs.msg import Pose, PoseStamped
-from carp_ros.msg import Ellipsoid, EllipsoidArray
+from carp_ros.msg import Ellipsoid, obstacleArray
 
 
 class Estimator(object):
 
     def __init__(self):
         rospy.init_node('Estimator', anonymous=True)
-
-        self.outputTopic = "quad0/obstacleList"
-
-        # path goal and position goal topics
-        self.trajPub = rospy.Publisher(
-            self.outputTopic, EllipsoidArray, queue_size=10)
+        self.estimator_pub = rospy.Publisher('obstacleList',
+                                             obstacleArray,
+                                             queue_size=10)
 
         rospy.loginfo("Estimator: Initalization complete")
 
@@ -25,8 +23,8 @@ class Estimator(object):
         raise NotImplementedError
 
     def run(self):
-        ellipsoidArrayMsg = self.update()
-        self.trajPub.publish(ellipsoidArrayMsg)
+        msg = self.update()
+        self.estimator_pub.publish(msg)
         rospy.sleep(.3)
 
 
@@ -37,16 +35,15 @@ class StaticEstimator(Estimator):
         super(StaticEstimator, self).__init__()
 
     def update(self):
-        ellipsoidArrayMsg = EllipsoidArray()
+        obArray = obstacleArray()
         ellipsoidMsg = Ellipsoid()
         # fill fake ellipsoid
-        ellipsoidMsg.center.x = 1.
-        ellipsoidMsg.center.y = 1.
-        ellipsoidMsg.center.z = 2.
-        ellipsoidMsg.shape = np.eye(3).flatten()
+        ellipsoidMsg.center = [1, 0, 2] + rand.random(3)*.1
+        ellipsoidMsg.shape = np.eye(3).flatten().tolist()
         # push back
-        ellipsoidArrayMsg.ellipsoids.append(ellipsoidMsg)
-        return ellipsoidArrayMsg
+        obArray.names.append("quad_x")
+        obArray.ellipsoids.append(ellipsoidMsg)
+        return obArray
 
 
 if __name__ == '__main__':

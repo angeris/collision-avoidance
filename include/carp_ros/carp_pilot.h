@@ -11,7 +11,6 @@
 #ifndef __CARP_PILOT_H__
 #define __CARP_PILOT_H__
 
-<<<<<<< HEAD
 #include <string>
 
 #include "ros/ros.h"
