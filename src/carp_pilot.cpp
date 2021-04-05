@@ -17,21 +17,21 @@ CarpPilot::CarpPilot() {
     "quad_ns", quadID_, "quad0"); 
   // topic names
   ros::param::param<std::string>(
-    "targetGoal_topic", targetGoal_topic_, "command/goal"); 
+    "~targetGoal_topic", targetGoal_topic_, "command/goal"); 
   ros::param::param<std::string>(
-    "targetPose_topic", targetPose_topic_, "command/pose"); 
+    "~targetPose_topic", targetPose_topic_, "command/pose"); 
   ros::param::param<std::string>(
-    "targetTwist_topic", targetTwist_topic_, "command/twist"); 
+    "~targetTwist_topic", targetTwist_topic_, "command/twist"); 
   ros::param::param<std::string>(
-    "obstacleList_topic", obstacleList_topic_, "obstacleList");
+    "~obstacleList_topic", obstacleList_topic_, "obstacleList");
   ros::param::param<std::string>(
-    "carpService_service", carpService_topic_, "carpService");
+    "~carpService_service", carpService_topic_, "carpService");
 
   // loop frequncies
   ros::param::param<double>(
-    "setpointFreq", setpointFreq_, 60.0);  
+    "~setpointFreq", setpointFreq_, 60.0);  
   ros::param::param<double>(
-    "plannerFreq", plannerFreq_, 1.0); 
+    "~plannerFreq", plannerFreq_, 40.0); 
 
 
   
@@ -55,11 +55,11 @@ CarpPilot::CarpPilot() {
       targetTwist_topic_, 1);
 
 
-
   // services
   carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
       carpService_topic_, true);
-  // carpServiceClient_.waitForExistence();
+  carpServiceClient_.waitForExistence();
+  ros::Duration(10.0).sleep();  // wait for the service to _actually_ be online
   ROS_INFO("connected to planner service");
 
   // initial pose is pose after takeoff
@@ -78,9 +78,9 @@ CarpPilot::CarpPilot() {
 
 
   carpSrv_.request.position = currentPose_.pose.position;
-  goalPose_.position.x = 0.0f;
-  goalPose_.position.y = 0.0f;
-  goalPose_.position.z = 0.0f;
+  goalPose_.position.x = 3.0f;
+  goalPose_.position.y = 3.0f;
+  goalPose_.position.z = 3.0f;
   carpSrv_.request.goal = goalPose_.position;
   carpSrv_.request.obstacles = obstacleList_;
 

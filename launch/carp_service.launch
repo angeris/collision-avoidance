@@ -2,5 +2,6 @@
 <launch>
     <group ns="quad0">
         <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen"/>
+        <!-- <node pkg="carp_ros" type="carpServer.py" name="carpServer" output="screen"/> -->
     </group>
 </launch>
