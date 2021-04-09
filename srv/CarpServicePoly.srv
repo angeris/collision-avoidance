@@ -1,0 +1,7 @@
+geometry_msgs/Point position
+geometry_msgs/Twist velocity
+geometry_msgs/Point goal
+obstacleArray obstacles
+---
+bool success
+geometry_msgs/Vector3[] trajectory

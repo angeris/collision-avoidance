@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <launch>
-    <group ns="quad0">
+    <arg name="ns"  default="$(env HOSTNAME)"/>
+    <group ns="$(arg ns)">
         <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen"/>
         <!-- <node pkg="carp_ros" type="carpServer.py" name="carpServer" output="screen"/> -->
     </group>
