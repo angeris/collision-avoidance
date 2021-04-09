@@ -145,6 +145,10 @@ void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
 
   if (carpServiceClient_.call(carpSrv_)){
       targetPoseSp_.pose.position = carpSrv_.response.projection;
+      targetPoseSp_.pose.orientation.x = 0.;
+      targetPoseSp_.pose.orientation.y = 0.;
+      targetPoseSp_.pose.orientation.z = 0.;
+      targetPoseSp_.pose.orientation.w = 1.;
   } else{
     ROS_ERROR("Failed to call carp service");
     std::cout << carpSrv_.response.projection.x << std::endl;

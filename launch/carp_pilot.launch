@@ -5,7 +5,8 @@
     <arg name="ns"  default="$(env HOSTNAME)"/>
     <!-- topic names -->
     <arg name="targetGoal_topic" default="command/goal"/>
-    <arg name="targetPose_topic" default="mavros/setpoint_position/local"/>
+    <!-- <arg name="targetPose_topic" default="mavros/setpoint_position/local"/> -->
+    <arg name="targetPose_topic" default="gcs/setpoint/pose"/>
     <arg name="targetTwist_topic" default="command/twist"/>
     <arg name="carpService_service" default="carpService"/>
     <arg name="setpointFreq" default="60.0"/>
