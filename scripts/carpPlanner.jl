@@ -1,6 +1,5 @@
 #!/usr/bin/julia
 
-
 using RobotOS
 using CARP
 
@@ -14,7 +13,7 @@ import .carp_ros.srv: CarpService, CarpServiceRequest, CarpServiceResponse
 
 agent = AgentModel()
 function carpServiceCB(req::CarpServiceRequest)
-    println("called")
+    # println("called")
     start = time()
     rsp = CarpServiceResponse()
     if length(req.obstacles.ellipsoids) == 0
@@ -22,7 +21,7 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection = req.goal
     else
         # build model
-        println("building problem")
+        # println("building problem")
         # set position
         pos  = [req.position.x, req.position.y, req.position.z]
         set_current_position!(agent, pos)
@@ -35,7 +34,7 @@ function carpServiceCB(req::CarpServiceRequest)
                            ob.center,
                            reshape(ob.shape, (3, 3)))
         end
-        println("sloving problem")
+        # println("solving problem")
         find_projection!(agent)
         rsp.success = agent.solved
         proj = agent.trajectory[:,end]
@@ -43,7 +42,7 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection.y = proj[2]
         rsp.projection.z = proj[3]
     end
-    println(time()-start)
+    # println(time()-start)
     # println(rsp.projection)
     return rsp
 end

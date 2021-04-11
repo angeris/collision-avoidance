@@ -160,7 +160,7 @@ void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
   targetPoseSp_.header.stamp = ros::Time::now();
   // targetTwistSp_.header.stamp = ros::Time::now();
   targetPose_pub.publish(targetPoseSp_);
-  std::cout << delay << std::endl;
+  // std::cout << delay << std::endl;
 }
 
 void CarpPilot::estimationLoopCB(const ros::TimerEvent& event) {
