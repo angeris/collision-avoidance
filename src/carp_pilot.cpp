@@ -58,8 +58,8 @@ CarpPilot::CarpPilot() {
   // services
   carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
       carpService_topic_, true);
+  // wait for the service to _actually_ be online
   carpServiceClient_.waitForExistence();
-  ros::Duration(10.0).sleep();  // wait for the service to _actually_ be online
   ROS_INFO("connected to planner service");
 
   // initial pose is pose after takeoff
@@ -94,12 +94,12 @@ CarpPilot::CarpPilot() {
   }
 
   // start timers
-  setpointTimer_ = nh_.createTimer(
-    ros::Duration(1.0/setpointFreq_),
-    &CarpPilot::setpointLoopCB, this);
+  // setpointTimer_ = nh_.createTimer(
+  //   ros::Duration(.01),
+  //   &CarpPilot::setpointLoopCB, this);
 
   plannerTimer_ = nh_.createTimer(
-    ros::Duration(1.0/plannerFreq_),
+    ros::Duration(.01),
     &CarpPilot::plannerLoopCB, this);
  
   // estimationTimer_ = nh_.createTimer(
@@ -131,6 +131,8 @@ void CarpPilot::obstacle_CB(const carp_ros::obstacleArray& msg){
 void CarpPilot::setpointLoopCB(const ros::TimerEvent& event) {
   // step along trajectory  
   // publish the target pose
+  double delay = event.current_real.toSec() - event.current_expected.toSec();
+  // std::cout << delay << std::endl;
   targetPoseSp_.header.stamp = ros::Time::now();
   // targetTwistSp_.header.stamp = ros::Time::now();
   targetPose_pub.publish(targetPoseSp_);
@@ -143,6 +145,7 @@ void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
   carpSrv_.request.goal = goalPose_.position;
   carpSrv_.request.obstacles = obstacleList_;
 
+  double startTime = ros::Time::now().toSec();
   if (carpServiceClient_.call(carpSrv_)){
       targetPoseSp_.pose.position = carpSrv_.response.projection;
       targetPoseSp_.pose.orientation.x = 0.;
@@ -151,8 +154,13 @@ void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
       targetPoseSp_.pose.orientation.w = 1.;
   } else{
     ROS_ERROR("Failed to call carp service");
-    std::cout << carpSrv_.response.projection.x << std::endl;
   }
+  double delay = ros::Time::now().toSec() - startTime;
+
+  targetPoseSp_.header.stamp = ros::Time::now();
+  // targetTwistSp_.header.stamp = ros::Time::now();
+  targetPose_pub.publish(targetPoseSp_);
+  std::cout << delay << std::endl;
 }
 
 void CarpPilot::estimationLoopCB(const ros::TimerEvent& event) {

@@ -13,6 +13,7 @@ import .carp_ros.msg: Ellipsoid, obstacleArray
 import .carp_ros.srv: CarpService, CarpServiceRequest, CarpServiceResponse
 function carpServiceCB(req::CarpServiceRequest)
     println("called")
+    start = time()
     rsp = CarpServiceResponse()
     if length(req.obstacles.ellipsoids) == 0
         println("no obstacles returning goal")
@@ -27,18 +28,13 @@ function carpServiceCB(req::CarpServiceRequest)
         # set goal
         goalPt = [req.goal.x, req.goal.y, req.goal.z]
         set_goal_point!(agent, goalPt)
-        println(pos)
-        println(goalPt)
         for (name, ob) in zip(req.obstacles.names, req.obstacles.ellipsoids)
-            println(name)
-            println(ob.center)
-            println(ob.shape)
             ob_shape = reshape(ob.shape, (3, 3))
             set_ellipsoid!(agent, name, 
                            ob.center,
                            reshape(ob.shape, (3, 3)))
         end
-        println("problem built")
+        println("sloving problem")
         find_projection!(agent)
         rsp.success = agent.solved
         proj = agent.trajectory[:,end]
@@ -46,7 +42,8 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection.y = proj[2]
         rsp.projection.z = proj[3]
     end
-    println(rsp.projection)
+    println(time()-start)
+    # println(rsp.projection)
     return rsp
 end
 
