@@ -11,6 +11,8 @@ rostypegen()
 import .geometry_msgs.msg: Pose, PoseStamped
 import .carp_ros.msg: Ellipsoid, obstacleArray
 import .carp_ros.srv: CarpService, CarpServiceRequest, CarpServiceResponse
+
+agent = AgentModel()
 function carpServiceCB(req::CarpServiceRequest)
     println("called")
     start = time()
@@ -20,7 +22,6 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection = req.goal
     else
         # build model
-        agent = AgentModel()
         println("building problem")
         # set position
         pos  = [req.position.x, req.position.y, req.position.z]
