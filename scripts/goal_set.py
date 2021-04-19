@@ -27,7 +27,7 @@ class Captian:
 
         while not rospy.is_shutdown():
             print("enter cmd")
-            cmd = raw_input("u for update, g for go")
+            cmd = raw_input("u for update, g for go: ")
             if cmd == "u":
                 self.setGoals()
             elif cmd == "g":
@@ -35,8 +35,7 @@ class Captian:
             else:
                 ROS_WARN("invalid cmd")
             # publish
-            self.goalPub.publish(goalMsg)
-            rospy.sleep(.5)
+            rospy.sleep(.1)
 
     def setGoals(self):
         for drone in self.manifest:
@@ -49,7 +48,7 @@ class Captian:
             self.goals[drone].position.z = z
 
     def sendGoals(self):
-        for drone, pub in zip(self.manifest, self.goalPub):
+        for drone, pub in zip(self.manifest, self.goalPubs):
             pub.publish(self.goals[drone])
 
 
