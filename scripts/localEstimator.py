@@ -38,7 +38,7 @@ class localEstimator(Estimator):
 
     def updateEstimate(self, key, measurement):
         self.ellipsoids[key].center = measurement
-        self.ellipsoids[key].shape = .36*np.eye(3).flatten().tolist()
+        self.ellipsoids[key].shape = (0.36*np.eye(3)).flatten().tolist()
 
     def update(self):
         obArray = obstacleArray()
