@@ -70,11 +70,11 @@ CarpPilot::CarpPilot() {
   }
 
 
-  while (ros::ok() && obstacleList_.ellipsoids.size() == 0) {
-      std::cout << "waiting for obs " << std::endl;
-      ros::spinOnce();
-      ros::Duration(1.0).sleep();
-  }
+  // while (ros::ok() && obstacleList_.ellipsoids.size() == 0) {
+  //     std::cout << "waiting for obs " << std::endl;
+  //     ros::spinOnce();
+  //     ros::Duration(1.0).sleep();
+  // }
 
 
   carpSrv_.request.position = currentPose_.pose.position;
