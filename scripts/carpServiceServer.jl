@@ -22,7 +22,7 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection = req.goal
     else
         # build model
-        println("got "+length(req.obstacles.ellipsoids)+ "elip")
+        println("building problem")
         # set position
         pos  = [req.position.x, req.position.y, req.position.z]
         set_current_position!(agent, pos)
@@ -35,7 +35,7 @@ function carpServiceCB(req::CarpServiceRequest)
                            ob.center,
                            reshape(ob.shape, (3, 3)))
         end
-        # println("solving problem")
+        println("solving problem")
         find_projection!(agent)
         rsp.success = agent.solved
         proj = agent.trajectory[:,end]
