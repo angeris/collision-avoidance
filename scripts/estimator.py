@@ -39,7 +39,7 @@ class StaticEstimator(Estimator):
         obArray.names.append("quad_x")
         ellipsoidMsg = Ellipsoid()
         # fill fake ellipsoid
-        ellipsoidMsg.center = [1, 0, 2] + rand.random(3)*.1
+        ellipsoidMsg.center = [1, -1, 2] + rand.random(3)*.1
         ellipsoidMsg.shape = np.eye(3).flatten().tolist()
         # push back
         obArray.ellipsoids.append(ellipsoidMsg)
@@ -47,7 +47,7 @@ class StaticEstimator(Estimator):
         obArray.names.append("quad_y")
         ellipsoidMsg = Ellipsoid()
         # fill fake ellipsoid
-        ellipsoidMsg.center = [1.5, 1, .7] + rand.random(3)*.1
+        ellipsoidMsg.center = [1.5, 0, .7] + rand.random(3)*.1
         ellipsoidMsg.shape = np.eye(3).flatten().tolist()
         # push back
         obArray.ellipsoids.append(ellipsoidMsg)
