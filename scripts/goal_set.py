@@ -16,7 +16,7 @@ class Captian:
 
         # goal topic
         self.manifest = rospy.get_param("~manifest").split(",")
-        self.goalPubs = [rospy.Publisher(drone+'/command/goal',
+        self.goalPubs = [rospy.Publisher("/"+drone+'/command/goal',
                          Pose, queue_size=10)
                          for drone in self.manifest]
         self.goals = {drone: Pose() for drone in self.manifest}
@@ -33,7 +33,7 @@ class Captian:
             elif cmd == "g":
                 self.sendGoals()
             else:
-                ROS_WARN("invalid cmd")
+                rospy.logwarn("invalid cmd")
             # publish
             rospy.sleep(.1)
 
