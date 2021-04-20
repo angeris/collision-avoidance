@@ -80,7 +80,7 @@ CarpPilot::CarpPilot() {
   carpSrv_.request.position = currentPose_.pose.position;
   goalPose_.position.x = currentPose_.pose.position.x;
   goalPose_.position.y = currentPose_.pose.position.y;
-  goalPose_.position.z = 1.5f;
+  goalPose_.position.z = 1.2f;
   goalPose_.orientation = currentPose_.pose.orientation;
   carpSrv_.request.goal = goalPose_.position;
   carpSrv_.request.obstacles = obstacleList_;
