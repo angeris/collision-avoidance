@@ -64,23 +64,23 @@ CarpPilot::CarpPilot() {
 
   // initial pose is pose after takeoff
   while (ros::ok() && currentPose_.header.seq < 10) {
-      std::cout << quadID_ << ": waiting for initial pose." << std::endl;
+      std::cout << "waiting for initial pose." << std::endl;
       ros::spinOnce();
       ros::Duration(1.0).sleep();
   }
 
 
-  while (ros::ok() && obstacleList_.ellipsoids.size() < 0) {
-      std::cout << quadID_ << ": waiting for obs " << std::endl;
+  while (ros::ok() && obstacleList_.ellipsoids.size() == 0) {
+      std::cout << "waiting for obs " << std::endl;
       ros::spinOnce();
       ros::Duration(1.0).sleep();
   }
 
 
   carpSrv_.request.position = currentPose_.pose.position;
-  goalPose_.position.x = 3.0f;
-  goalPose_.position.y = 3.0f;
-  goalPose_.position.z = 3.0f;
+  goalPose_.position.x = currentPose_.pose.position.x;
+  goalPose_.position.y = currentPose_.pose.position.y;
+  goalPose_.position.z = 1.5f;
   carpSrv_.request.goal = goalPose_.position;
   carpSrv_.request.obstacles = obstacleList_;
 
@@ -119,6 +119,7 @@ void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
 
 void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
   // unpack the pose
+  ROS_INFO("new goal");
   goalPose_ = msg;
 }
 

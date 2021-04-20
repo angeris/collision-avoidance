@@ -20,13 +20,13 @@ class localEstimator(Estimator):
         self.egoName = rospy.get_namespace().strip("/")
         self.manifest = rospy.get_param("~manifest").split(",")
         self.manifest.remove(self.egoName)
-        self.poseTopic = "/mavros/local_position/pose"
+        self.poseTopic = "/mavros/vision_pose/pose"
         # init estimation objects
         self.ellipsoids = {k: Ellipsoid() for k in self.manifest}
         self.subs = []
         for drone in self.manifest:
             self.subs.append(rospy.Subscriber(
-                                drone+self.poseTopic,
+                                "/"+drone+self.poseTopic,
                                 PoseStamped,
                                 self.poseCB, drone))
 
@@ -52,6 +52,5 @@ class localEstimator(Estimator):
 if __name__ == '__main__':
     # make tower
     estimator = localEstimator()
-    rospy.loginfo("Estimator: Initalization complete")
     while not rospy.is_shutdown():
         estimator.run()

@@ -22,8 +22,8 @@
             <param name="plannerFreq" value="$(arg plannerFreq)"/>
         </node>
         <!-- <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen"/> -->
-        <node pkg="carp_ros" type="estimator.py" name="estimator" output="screen">
-            <param name="manifest" value="drone6,drone7,machi"/>
+        <node pkg="carp_ros" type="localEstimator.py" name="estimator" output="screen">
+            <param name="manifest" value="drone6,drone7"/>
         </node>
 
     </group>
