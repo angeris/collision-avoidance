@@ -26,7 +26,7 @@ class localEstimator(Estimator):
         self.subs = []
         for drone in self.manifest:
             self.subs.append(rospy.Subscriber(
-                                drone+self.poseTopic,
+                                "/"+drone+self.poseTopic,
                                 PoseStamped,
                                 self.poseCB, drone))
 
