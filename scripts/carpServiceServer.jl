@@ -22,7 +22,7 @@ function carpServiceCB(req::CarpServiceRequest)
         rsp.projection = req.goal
     else
         # build model
-        # println("building problem")
+        println("got "+length(req.obstacles.ellipsoids)+ "elip")
         # set position
         pos  = [req.position.x, req.position.y, req.position.z]
         set_current_position!(agent, pos)

@@ -3,7 +3,7 @@
   <!-- launches goal set under / namespace-->
   <group ns="$(env HOSTNAME)">
       <node pkg="carp_ros" type="goal_set.py" name="goalSet" output="screen">
-        <param name="manifest" value="drone6,drone7,machi"/>
+        <param name="manifest" value="drone6,drone7"/>
       </node> 
   </group>
 </launch>
