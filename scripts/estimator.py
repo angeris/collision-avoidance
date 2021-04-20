@@ -13,11 +13,10 @@ class Estimator(object):
 
     def __init__(self):
         rospy.init_node('Estimator', anonymous=True)
+        rospy.loginfo("Estimator: Initalization")
         self.estimator_pub = rospy.Publisher('obstacleList',
                                              obstacleArray,
                                              queue_size=10)
-
-        rospy.loginfo("Estimator: Initalization complete")
 
     def update(self):
         raise NotImplementedError
@@ -56,5 +55,6 @@ class StaticEstimator(Estimator):
 
 if __name__ == '__main__':
     Estimator = StaticEstimator()
+    rospy.loginfo("Estimator: Initalization complete")
     while not rospy.is_shutdown():
         Estimator.run()

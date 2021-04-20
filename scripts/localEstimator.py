@@ -52,6 +52,5 @@ class localEstimator(Estimator):
 if __name__ == '__main__':
     # make tower
     estimator = localEstimator()
-    rospy.loginfo("Estimator: Initalization complete")
     while not rospy.is_shutdown():
         estimator.run()
