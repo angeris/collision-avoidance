@@ -20,7 +20,7 @@ class localEstimator(Estimator):
         self.egoName = rospy.get_namespace().strip("/")
         self.manifest = rospy.get_param("~manifest").split(",")
         self.manifest.remove(self.egoName)
-        self.poseTopic = "/mavros/vison_pose/pose"
+        self.poseTopic = "/mavros/vision_pose/pose"
         # init estimation objects
         self.ellipsoids = {k: Ellipsoid() for k in self.manifest}
         self.subs = []
