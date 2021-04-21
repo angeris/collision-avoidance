@@ -24,7 +24,7 @@ class Estimator(object):
     def run(self):
         msg = self.update()
         self.estimator_pub.publish(msg)
-        rospy.sleep(1/self.freq)
+        rospy.sleep(1./self.freq)
 
 
 class StaticEstimator(Estimator):

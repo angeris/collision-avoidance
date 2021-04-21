@@ -14,7 +14,7 @@
 
     
     <group ns="drone6">
-         <node pkg="carp_ros" type="pilot" name="flight" output="screen">
+         <node pkg="carp_ros" type="carp_pilot" name="flight" output="screen">
    <param name="quad_ns" value="$(arg ns)"/>
             <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
             <param name="carpService_service" value="$(arg carpService_service)"/>
@@ -25,13 +25,13 @@
             <param name="position" value="3,1.5,1.2"/>
         </node>
         <node pkg="carp_ros" type="setEstimator.py" name="estimator" output="screen">
-            <param name="estimationFreq" value="2"/>
+            <param name="estimationFreq" value="100."/>
             <param name="manifest" value="drone6,drone7"/>
         </node>
     </group>
 
     <group ns="drone7">
-         <node pkg="carp_ros" type="pilot" name="flight" output="screen">
+         <node pkg="carp_ros" type="carp_pilot" name="flight" output="screen">
            <param name="quad_ns" value="$(arg ns)"/>
             <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
             <param name="carpService_service" value="$(arg carpService_service)"/>
@@ -42,7 +42,7 @@
             <param name="position" value="-3,-1.5,1.2"/>
         </node>
         <node pkg="carp_ros" type="setEstimator.py" name="estimator" output="screen">
-            <param name="estimationFreq" value="2"/>
+            <param name="estimationFreq" value="100."/>
             <param name="manifest" value="drone6,drone7"/>
         </node>
     </group>

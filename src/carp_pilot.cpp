@@ -27,11 +27,9 @@ CarpPilot::CarpPilot() {
   ros::param::param<std::string>(
     "~carpService_service", carpService_topic_, "carpService");
 
-  // loop frequncies
+  // loop frequencies
   ros::param::param<double>(
-    "~setpointFreq", setpointFreq_, 60.0);  
-  ros::param::param<double>(
-    "~plannerFreq", plannerFreq_, 40.0); 
+    "~plannerFreq", plannerFreq_, 60.0); 
 
 
   
@@ -58,7 +56,7 @@ CarpPilot::CarpPilot() {
   // services
   carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
       carpService_topic_, true);
-  // wait for the service to _actually_ be online
+  // wait for the service to _actually_ be on line
   carpServiceClient_.waitForExistence();
   ROS_INFO("connected to planner service");
 
@@ -95,17 +93,11 @@ CarpPilot::CarpPilot() {
   }
 
   // start timers
-  // setpointTimer_ = nh_.createTimer(
-  //   ros::Duration(.01),
-  //   &CarpPilot::setpointLoopCB, this);
 
   plannerTimer_ = nh_.createTimer(
-    ros::Duration(.01),
+    ros::Duration(1/plannerFreq_),
     &CarpPilot::plannerLoopCB, this);
  
-  // estimationTimer_ = nh_.createTimer(
-  //   ros::Duration(1.0/estimationFreq_),
-  //   &CarpPilot::estimationLoopCB, this);
   ROS_INFO("pilot: initialzation complete");
 }
 
@@ -160,6 +152,7 @@ void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
   double delay = ros::Time::now().toSec() - startTime;
 
   targetPoseSp_.header.stamp = ros::Time::now();
+  targetPoseSp_.header.frame_id = "/world";
   // targetTwistSp_.header.stamp = ros::Time::now();
   targetPose_pub.publish(targetPoseSp_);
   // std::cout << delay << std::endl;

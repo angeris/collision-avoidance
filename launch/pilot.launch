@@ -9,9 +9,10 @@
     <arg name="targetPose_topic" default="gcs/setpoint/pose"/>
     <arg name="targetTwist_topic" default="command/twist"/>
     <arg name="carpService_service" default="carpService"/>
-    <arg name="plannerFreq" default="30.0"/>
+    <arg name="plannerFreq" default="60.0"/>
+    <arg name="estimationFreq" default="80.0"/>
 
-    
+   
     <group ns="$(arg ns)">
         <node pkg="carp_ros" type="carp_pilot" name="flight" output="screen">
             <param name="quad_ns" value="$(arg ns)"/>
@@ -20,7 +21,8 @@
             <param name="plannerFreq" value="$(arg plannerFreq)"/>
         </node>
         <!-- <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen"/> -->
-        <node pkg="carp_ros" type="localEstimator.py" name="estimator" output="screen">
+        <node pkg="carp_ros" type="setEstimator.py" name="estimator" output="screen">
+            <param name="estimationFreq" value="$(arg estimationFreq)"/>
             <param name="manifest" value="drone6,drone7"/>
         </node>
 

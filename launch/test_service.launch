@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <group ns="drone6">
+        <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen"/>
+        <!-- <node pkg="carp_ros" type="carpServer.py" name="carpServer" output="screen"/> -->
+    </group>
+    <group ns="drone7">
+        <node pkg="carp_ros" type="carpServiceServer.jl" name="carpServer" output="screen"/>
+        <!-- <node pkg="carp_ros" type="carpServer.py" name="carpServer" output="screen"/> -->
+    </group>
+</launch>
