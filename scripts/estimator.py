@@ -13,10 +13,10 @@ class Estimator(object):
 
     def __init__(self):
         rospy.init_node('Estimator', anonymous=True)
-        rospy.loginfo("Estimator: Initalization")
         self.estimator_pub = rospy.Publisher('obstacleList',
                                              obstacleArray,
                                              queue_size=10)
+        self.freq = rospy.get_param("~estimationFreq")
 
     def update(self):
         raise NotImplementedError
@@ -24,7 +24,7 @@ class Estimator(object):
     def run(self):
         msg = self.update()
         self.estimator_pub.publish(msg)
-        rospy.sleep(.3)
+        rospy.sleep(1/self.freq)
 
 
 class StaticEstimator(Estimator):

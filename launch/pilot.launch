@@ -9,7 +9,6 @@
     <arg name="targetPose_topic" default="gcs/setpoint/pose"/>
     <arg name="targetTwist_topic" default="command/twist"/>
     <arg name="carpService_service" default="carpService"/>
-    <arg name="setpointFreq" default="60.0"/>
     <arg name="plannerFreq" default="30.0"/>
 
     
@@ -18,7 +17,6 @@
             <param name="quad_ns" value="$(arg ns)"/>
             <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
             <param name="carpService_service" value="$(arg carpService_service)"/>
-            <param name="setpointFreq" value="$(arg setpointFreq)"/>
             <param name="plannerFreq" value="$(arg plannerFreq)"/>
         </node>
         <!-- <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen"/> -->

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <!-- quad name -->
+    <arg name="ns"  default="$(env HOSTNAME)"/>
+    <!-- topic names -->
+    <arg name="targetGoal_topic" default="command/goal"/>
+    <!-- <arg name="targetPose_topic" default="mavros/setpoint_position/local"/> -->
+    <arg name="targetPose_topic" default="gcs/setpoint/pose"/>
+    <arg name="targetTwist_topic" default="command/twist"/>
+    <arg name="carpService_service" default="carpService"/>
+    <arg name="setpointFreq" default="60.0"/>
+    <arg name="plannerFreq" default="30.0"/>
+
+    
+    <group ns="drone6">
+         <node pkg="carp_ros" type="pilot" name="flight" output="screen">
+   <param name="quad_ns" value="$(arg ns)"/>
+            <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
+            <param name="carpService_service" value="$(arg carpService_service)"/>
+            <param name="setpointFreq" value="$(arg setpointFreq)"/>
+            <param name="plannerFreq" value="$(arg plannerFreq)"/>
+        </node>
+        <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen">
+            <param name="position" value="3,1.5,1.2"/>
+        </node>
+        <node pkg="carp_ros" type="setEstimator.py" name="estimator" output="screen">
+            <param name="estimationFreq" value="2"/>
+            <param name="manifest" value="drone6,drone7"/>
+        </node>
+    </group>
+
+    <group ns="drone7">
+         <node pkg="carp_ros" type="pilot" name="flight" output="screen">
+           <param name="quad_ns" value="$(arg ns)"/>
+            <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
+            <param name="carpService_service" value="$(arg carpService_service)"/>
+            <param name="setpointFreq" value="$(arg setpointFreq)"/>
+            <param name="plannerFreq" value="$(arg plannerFreq)"/>
+        </node>
+        <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen">
+            <param name="position" value="-3,-1.5,1.2"/>
+        </node>
+        <node pkg="carp_ros" type="setEstimator.py" name="estimator" output="screen">
+            <param name="estimationFreq" value="2"/>
+            <param name="manifest" value="drone6,drone7"/>
+        </node>
+    </group>
+</launch>
