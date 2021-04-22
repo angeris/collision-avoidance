@@ -7,6 +7,7 @@ Panels:
         - /Global Options1
         - /Status1
         - /drone71/Status1
+        - /drone7-goal1
         - /drone7-goal1/Status1
         - /drone61/Status1
         - /drone6-goal1
@@ -81,7 +82,7 @@ Visualization Manager:
       Shaft Length: 1
       Shaft Radius: 0.0500000007
       Shape: Arrow
-      Topic: /drone7/mavros/setpoint_position/local
+      Topic: /drone7/gcs/setpoint/pose
       Unreliable: false
       Value: true
     - Alpha: 1
@@ -111,7 +112,7 @@ Visualization Manager:
       Shaft Length: 1
       Shaft Radius: 0.0500000007
       Shape: Arrow
-      Topic: /drone6/mavros/setpoint_position/local
+      Topic: /drone6/gcs/setpoint/pose
       Unreliable: false
       Value: true
   Enabled: true
@@ -139,25 +140,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/ThirdPersonFollower
-      Distance: 11.0492592
+      Distance: 7.6126976
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: -0.0969268084
-        Y: -5.59890413
-        Z: -1.43051147e-06
+        X: 0.447589785
+        Y: -3.52798271
+        Z: -1.90734863e-06
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.420398116
+      Pitch: 0.650397897
       Target Frame: <Fixed Frame>
       Value: ThirdPersonFollower (rviz)
-      Yaw: 4.06541157
+      Yaw: 4.67541313
     Saved: ~
 Window Geometry:
   Displays:

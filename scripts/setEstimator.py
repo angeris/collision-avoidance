@@ -41,8 +41,8 @@ class setEstimator(Estimator):
         mNoise = np.eye(3)*0.09  # .3 localization error
 
         # z elongated margin
-        self.bubble = np.array([[.2, 0, 0],
-                                [0, .2, 0],
+        self.bubble = np.array([[.3, 0, 0],
+                                [0, .3, 0],
                                 [0, 0, .4]])
 
         # init estimation objects
