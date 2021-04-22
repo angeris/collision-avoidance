@@ -24,9 +24,9 @@ class Quad(object):
 
     def update(self):
         poseSP = PoseStamped()
-        poseSP.pose.position.x = float(self.position[0]) + rand.random()*.1
-        poseSP.pose.position.y = float(self.position[1]) + rand.random()*.1
-        poseSP.pose.position.z = float(self.position[2]) + rand.random()*.1
+        poseSP.pose.position.x = float(self.position[0]) + rand.random()*0
+        poseSP.pose.position.y = float(self.position[1]) + rand.random()*0
+        poseSP.pose.position.z = float(self.position[2]) + rand.random()*0
         poseSP.header.stamp = rospy.Time.now()
         poseSP.header.frame_id = '/world'
         return poseSP

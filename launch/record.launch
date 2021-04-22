@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+ <node pkg="rosbag" type="record" name="rosbag_record_diag"
+       args="record -o carp/ /drone6/mavros/vision_pose/pose /drone6/obstacleList /drone6/setpoint/pose /drone7/mavros/vision_pose/pose /drone7/obstacleList /drone7/setpoint/pose "/>   
+</launch>
