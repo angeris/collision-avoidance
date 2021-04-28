@@ -2,6 +2,8 @@
 <launch>
     <arg name="ns"  default="$(env HOSTNAME)"/>
     <group ns="$(arg ns)">
-        <node pkg="carp_ros" type="carpServicePolyServer.jl" name="carpServer" output="screen"/>
+        <node pkg="carp_ros" type="carpServicePolyServer.jl" name="carpServer" output="screen">
+            <param name="order" value="3"/>
+        </node>
     </group>
 </launch>

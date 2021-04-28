@@ -13,13 +13,19 @@ import .carp_ros.msg: Ellipsoid, obstacleArray
 import .carp_ros.srv: CarpServicePoly, CarpServicePolyRequest, CarpServicePolyResponse
 
 
-order = get_param("~order")
+if has_param("order")
+    order = get_param("order")
+    order = parse(Float64, order)
+else
+    order = 3
+end
+println("order: ", order)
 
 agent = AgentModel(order=order)
-function carpServiceCB(req::CarpServiceRequest)
+function carpServiceCB(req::CarpServicePolyRequest)
     # println("called")
     start = time()
-    rsp = CarpServiceResponse()
+    rsp = CarpServicePolyResponse()
     if length(req.obstacles.ellipsoids) == 0
         println("no obstacles returning goal")
         rsp.projection = req.goal
@@ -56,7 +62,7 @@ end
 
 function main()  
     init_node("carp_server")
-    carpServiceServer = RobotOS.Service{CarpService}(
+    carpServiceServer = RobotOS.Service{CarpServicePoly}(
                             "carpService", carpServiceCB)
     println("CARP service online")
 end

@@ -21,7 +21,7 @@ class Bezier {
     ~Bezier();
     
     // set coefficents
-    void setCoeff(std::vector<float>& c);
+    void setCoeff(const std::vector<float>& c);
 
     // get values and derivitive
     float evaluate(float t);

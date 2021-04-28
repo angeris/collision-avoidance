@@ -116,18 +116,26 @@ CarpPilot::~CarpPilot(){
 void CarpPilot::readTrajectory(const carp_ros::CarpServicePoly::Response &rsp){
   trajectoryStartTime_ = ros::Time::now();
   for (auto i = rsp.trajectory.x.begin(); i != rsp.trajectory.x.end(); ++i){
-    std::cout << *i << std::endl; 
+    std::cout << *i << " "; 
   }
+  std::cout << std::endl;
   for (auto i = rsp.trajectory.y.begin(); i != rsp.trajectory.y.end(); ++i){
-    std::cout << *i << std::endl; 
+    std::cout << *i << " "; 
   }
+  std::cout << std::endl;
   for (auto i = rsp.trajectory.z.begin(); i != rsp.trajectory.z.end(); ++i){
-    std::cout << *i << std::endl; 
+    std::cout << *i << " "; 
   }
-  // trajectory.x.setCoeff(rsp.trajectory.x);
-  // trajectory.y.setCoeff(rsp.trajectory.y);
-  // trajectory.z.setCoeff(rsp.trajectory.z);
+  std::cout << std::endl;
+  trajectory.x.setCoeff(rsp.trajectory.x);
+  trajectory.y.setCoeff(rsp.trajectory.y);
+  trajectory.z.setCoeff(rsp.trajectory.z);
 
+  std::vector<float> pt = trajectory.evaluate(0.5f);
+  for (auto i = pt.begin(); i != pt.end(); ++i){
+      std::cout << *i << " "; 
+  }
+  std::cout << std::endl;
 
 }
 void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){

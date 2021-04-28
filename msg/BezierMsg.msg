@@ -1,4 +1,4 @@
 # This represents an 3d bezier curve
-float64[] x
-float64[] y
-float64[] z
+float32[] x
+float32[] y
+float32[] z

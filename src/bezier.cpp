@@ -21,7 +21,7 @@ Bezier::Bezier(int order){
 Bezier::~Bezier() {
 }
 
-void Bezier::setCoeff(std::vector<float>& c){
+void Bezier::setCoeff(const std::vector<float>& c){
     for (int i = 0; i< c.size(); i++) {
         _coeff[i] = c[i];
     }
@@ -63,5 +63,13 @@ void Bezier3d::setCoeff(std::map<char, std::vector<float>> coeff) {
     x.setCoeff(coeff['x']);
     y.setCoeff(coeff['y']);
     z.setCoeff(coeff['z']);
+}
+
+std::vector<float> Bezier3d::evaluate(float t){
+    std::vector<float> value;
+    value.push_back(x.evaluate(t));
+    value.push_back(y.evaluate(t));
+    value.push_back(z.evaluate(t));
+    return value;
 }
 
