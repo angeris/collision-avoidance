@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="ns"  default="$(env HOSTNAME)"/>
+    <group ns="$(arg ns)">
+        <node pkg="carp_ros" type="carpServicePolyServer.jl" name="carpServer" output="screen"/>
+    </group>
+</launch>

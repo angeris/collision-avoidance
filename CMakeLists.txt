@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Eigen3 REQUIRED)
+find_package(Boost REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -53,6 +54,7 @@ find_package(Eigen3 REQUIRED)
 add_message_files(
   FILES
   Ellipsoid.msg
+  BezierMsg.msg
   obstacleArray.msg
 )
 
@@ -124,12 +126,13 @@ include_directories(
  include
  ${catkin_INCLUDE_DIRS}
  ${EIGEN3_INCLUDE_DIR}
+ ${Boost_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/carp_ros.cpp
-# )
+add_library(${PROJECT_NAME}
+  src/bezier.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -141,6 +144,10 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
 add_executable(carp_pilot src/carp_pilot.cpp)
 target_link_libraries(carp_pilot ${catkin_LIBRARIES})
+add_dependencies(carp_pilot ${PROJECT_NAME}_generate_messages_cpp)
+
+add_executable(carp_pilot_poly src/carp_pilot_poly.cpp)
+target_link_libraries(carp_pilot_poly ${PROJECT_NAME} ${catkin_LIBRARIES})
 add_dependencies(carp_pilot ${PROJECT_NAME}_generate_messages_cpp)
 
 

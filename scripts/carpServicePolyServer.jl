@@ -4,11 +4,11 @@
 using RobotOS
 using CARP
 
-@rosimport geometry_msgs.msg: Pose, PoseStamped
+@rosimport geometry_msgs.msg: Vector3, Pose, PoseStamped
 @rosimport carp_ros.msg: Ellipsoid, obstacleArray
 @rosimport carp_ros.srv: CarpServicePoly
 rostypegen()
-import .geometry_msgs.msg: Pose, PoseStamped
+import .geometry_msgs.msg: Vector3, Pose, PoseStamped
 import .carp_ros.msg: Ellipsoid, obstacleArray
 import .carp_ros.srv: CarpServicePoly, CarpServicePolyRequest, CarpServicePolyResponse
 
@@ -30,7 +30,7 @@ function carpServiceCB(req::CarpServiceRequest)
         pos  = [req.position.x, req.position.y, req.position.z]
         set_current_position!(agent, pos)
         # set velocity 
-        vel = [req.velocity.linear.x, req.velocity.linear.y, req.velocity.linear.z]
+        vel = [req.velocity.x, req.velocity.y, req.velocity.z]
         set_current_velocity!(agent, vel)
         # set goal
         goalPt = [req.goal.x, req.goal.y, req.goal.z]
@@ -44,10 +44,10 @@ function carpServiceCB(req::CarpServiceRequest)
         # println("solving problem")
         find_projection!(agent)
         rsp.success = agent.solved
-        proj = agent.trajectory[:,end]
-        rsp.projection.x = proj[1]
-        rsp.projection.y = proj[2]
-        rsp.projection.z = proj[3]
+        # unpack trajectory
+        rsp.trajectory.x = agent.trajectory[1, :]
+        rsp.trajectory.y = agent.trajectory[2, :]
+        rsp.trajectory.z = agent.trajectory[3, :]
     end
     # println(time()-start)
     # println(rsp.projection)

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+    <!-- quad name -->
+    <arg name="mav_name" default="quad"/>
+    <arg name="id" default="0"/>
+    <arg name="quad_ns"  default="$(arg mav_name)$(arg id)"/>
+    <!-- topic names -->
+    <arg name="targetGoal_topic" default="command/goal"/>
+    <arg name="targetPose_topic" default="mavros/setpoint_position/local"/>
+    <arg name="targetTwist_topic" default="command/twist"/>
+    <arg name="carpService_service" default="carpService"/>
+    <arg name="setpointFreq" default="100.0"/>
+    <arg name="plannerFreq" default="60.0"/>
+
+    
+    <group ns="$(arg mav_name)$(arg id)">
+        <node pkg="carp_ros" type="carp_pilot" name="flight" output="screen">
+            <param name="quad_ns" value="$(arg quad_ns)"/>
+            <param name="targetPose_topic" value="$(arg targetPose_topic)"/>
+            <param name="carpService_service" value="$(arg carpService_service)"/>
+            <param name="setpointFreq" value="$(arg setpointFreq)"/>
+            <param name="plannerFreq" value="$(arg plannerFreq)"/>
+        </node>
+        <!-- <node pkg="carp_ros" type="quadSim.py" name="quadSim" output="screen"/> -->
+        <node pkg="carp_ros" type="estimator.py" name="estimator" output="screen"/>
+
+    </group>
+</launch>

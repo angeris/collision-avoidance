@@ -18,6 +18,9 @@
 #include "geometry_msgs/TwistStamped.h"
 // #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include "carp_ros/CarpServicePoly.h"
+#include "carp_ros/BezierMsg.h"
+
+#include "bezier.h"
 
 class CarpPilot {
  public:
@@ -50,14 +53,12 @@ class CarpPilot {
     double setpointFreq_;
     ros::Timer setpointTimer_; 
     void setpointLoopCB(const ros::TimerEvent& event);
+    void publishSetpoints();
+
     // planner loop
     double plannerFreq_;
     ros::Timer plannerTimer_; 
     void plannerLoopCB(const ros::TimerEvent& event);
-    // estimation loop
-    double estimationFreq_;
-    ros::Timer estimationTimer_; 
-    void estimationLoopCB(const ros::TimerEvent& event);
 
     // px4 pose subscriber
     // current pose
@@ -83,11 +84,15 @@ class CarpPilot {
     // out going pubs
     ros::Publisher targetPose_pub;
     ros::Publisher targetTwist_pub;
-    // current trajectory time
-    // ros::Time trajectoryTime_=0.0f;
+    
+
+    //current trajectory 
+    ros::Time trajectoryStartTime_;
+    Bezier3d trajectory;
+    void readTrajectory(const carp_ros::CarpServicePoly::Response &rsp);
 
     // carp service
-    carp_ros::CarpServicePolyt carpSrv_; //data container
+    carp_ros::CarpServicePoly carpSrv_; //data container
     ros::ServiceClient carpServiceClient_; //service client
 
 };

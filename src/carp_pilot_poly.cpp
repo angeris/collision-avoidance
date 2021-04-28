@@ -38,6 +38,10 @@ CarpPilot::CarpPilot() {
     "mavros/local_position/pose", 1,
     &CarpPilot::currentPose_CB, this);
 
+  currentTwist_sub = nh_.subscribe(
+    "mavros/local_position/velocity", 1,
+    &CarpPilot::currentTwist_CB, this);
+
   targetGoal_sub_ = nh_.subscribe(
     targetGoal_topic_,1,
     &CarpPilot::targetGoal_CB, this);
@@ -54,7 +58,7 @@ CarpPilot::CarpPilot() {
 
 
   // services
-  carpServiceClient_ = nh_.serviceClient<carp_ros::CarpService>(
+  carpServiceClient_ = nh_.serviceClient<carp_ros::CarpServicePoly>(
       carpService_topic_, true);
   // wait for the service to _actually_ be on line
   carpServiceClient_.waitForExistence();
@@ -74,19 +78,22 @@ CarpPilot::CarpPilot() {
       ros::Duration(1.0).sleep();
   }
 
-
+  // set intial position and goal 
   carpSrv_.request.position = currentPose_.pose.position;
+  carpSrv_.request.velocity = currentTwist_.twist.linear;
+  // set goal to 1.2 m above starting point 
   goalPose_.position.x = currentPose_.pose.position.x;
   goalPose_.position.y = currentPose_.pose.position.y;
   goalPose_.position.z = 1.2f;
   goalPose_.orientation = currentPose_.pose.orientation;
+  // set goal and ob for service calls
   carpSrv_.request.goal = goalPose_.position;
   carpSrv_.request.obstacles = obstacleList_;
 
    // initial service call
   ROS_INFO("calling service");
   if (carpServiceClient_.call(carpSrv_)) {
-    targetPoseSp_.pose.position = carpSrv_.response.projection;
+    readTrajectory(carpSrv_.response);
     ROS_INFO("inital planner success");
   } else{
     ROS_WARN("IDK MAN");
@@ -106,8 +113,29 @@ CarpPilot::~CarpPilot(){
 
 }
 
+void CarpPilot::readTrajectory(const carp_ros::CarpServicePoly::Response &rsp){
+  trajectoryStartTime_ = ros::Time::now();
+  for (auto i = rsp.trajectory.x.begin(); i != rsp.trajectory.x.end(); ++i){
+    std::cout << *i << std::endl; 
+  }
+  for (auto i = rsp.trajectory.y.begin(); i != rsp.trajectory.y.end(); ++i){
+    std::cout << *i << std::endl; 
+  }
+  for (auto i = rsp.trajectory.z.begin(); i != rsp.trajectory.z.end(); ++i){
+    std::cout << *i << std::endl; 
+  }
+  // trajectory.x.setCoeff(rsp.trajectory.x);
+  // trajectory.y.setCoeff(rsp.trajectory.y);
+  // trajectory.z.setCoeff(rsp.trajectory.z);
+
+
+}
 void CarpPilot::currentPose_CB(const geometry_msgs::PoseStamped& msg){
   currentPose_ = msg;
+}
+
+void CarpPilot::currentTwist_CB(const geometry_msgs::TwistStamped& msg){
+  currentTwist_ = msg;
 }
 
 void CarpPilot::targetGoal_CB(const geometry_msgs::Pose& msg) {
@@ -133,33 +161,35 @@ void CarpPilot::setpointLoopCB(const ros::TimerEvent& event) {
   // targetTwist_pub.publish(targetTwistSp_)
 }
 
-void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
-  // call the CARP service
-  carpSrv_.request.position = currentPose_.pose.position;
-  carpSrv_.request.goal = goalPose_.position;
-  carpSrv_.request.obstacles = obstacleList_;
-
-  double startTime = ros::Time::now().toSec();
-  if (carpServiceClient_.call(carpSrv_)){
-      targetPoseSp_.pose.position = carpSrv_.response.projection;
-      targetPoseSp_.pose.orientation.x = 0.;
-      targetPoseSp_.pose.orientation.y = 0.;
-      targetPoseSp_.pose.orientation.z = 0.;
-      targetPoseSp_.pose.orientation.w = 1.;
-  } else{
-    ROS_ERROR("Failed to call carp service");
-  }
-  double delay = ros::Time::now().toSec() - startTime;
+void CarpPilot::publishSetpoints(){
+  targetPoseSp_.pose.orientation.x = 0.;
+  targetPoseSp_.pose.orientation.y = 0.;
+  targetPoseSp_.pose.orientation.z = 0.;
+  targetPoseSp_.pose.orientation.w = 1.;
 
   targetPoseSp_.header.stamp = ros::Time::now();
   targetPoseSp_.header.frame_id = "/world";
   // targetTwistSp_.header.stamp = ros::Time::now();
   targetPose_pub.publish(targetPoseSp_);
-  // std::cout << delay << std::endl;
+
 }
 
-void CarpPilot::estimationLoopCB(const ros::TimerEvent& event) {
+void CarpPilot::plannerLoopCB(const ros::TimerEvent& event) {
+  // call the CARP service
+  carpSrv_.request.position = currentPose_.pose.position;
+  carpSrv_.request.velocity = currentTwist_.twist.linear;
+  carpSrv_.request.goal = goalPose_.position;
+  carpSrv_.request.obstacles = obstacleList_;
 
+  double startTime = ros::Time::now().toSec();
+  if (carpServiceClient_.call(carpSrv_)){
+      readTrajectory(carpSrv_.response);
+
+  } else{
+    ROS_WARN("carp service failed");
+  }
+
+  publishSetpoints();
 }
 
 
